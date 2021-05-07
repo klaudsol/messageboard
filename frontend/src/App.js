@@ -1,43 +1,67 @@
 import logo from './logo.svg';
 import './App.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import { Container, Row, Col, Form, Button } from 'react-bootstrap';
+import '@shopify/polaris/dist/styles.css';
+import enTranslations from '@shopify/polaris/locales/en.json';
+import {AppProvider, Page, Card, Button, Form, FormLayout, Checkbox, TextField, DataTable} from '@shopify/polaris';
+import {useState, useCallback} from 'react';
 
 function App() {
+  const [name, setName] = useState('');
+  const [message, setMessage] = useState('');
+
+  const handleSubmit = useCallback((_event) => {
+  }, []);
+
+  const handleNewsLetterChange = useCallback(
+    [],
+  );
+
+
+  
   return (
     <div className="App">
       <header className="App-header">
-        <Container>
-          <Form>
-    <Form.Group controlId="formBasicEmail">
-      <Form.Label>Name</Form.Label>
-      <Form.Control placeholder="Enter your name" />
-    </Form.Group>
-  
-    <Form.Group controlId="formBasicPassword">
-      <Form.Label>Message</Form.Label>
-      <Form.Control as="textarea" className="text-muted" rows={10} placeholder="Enter your message here." />
-    </Form.Group>
-    <Form.Group>
-      <Button className="mt-3 text-right" variant="primary" type="submit">
-        Submit
-      </Button>
-    </Form.Group>
-  </Form>
-          </Container>
-          
-        <Container className='mt-5'>
-        {[...Array(10)].map((x) => (          
-          <Container className='p-4 mb-1 border border-muted rounded'>
-            <Row>
-              Name
-            </Row>
-            <Row>
-              Message 
-            </Row>
-          </Container>
-         ))}
-        </Container>          
+      <AppProvider i18n={enTranslations}>
+          <Page title="Messageboard App">
+    <Form onSubmit={handleSubmit}>
+      <FormLayout>
+
+        <TextField
+          value={name}
+          onChange={(name) => setName(name)}
+          label="Name"
+        />
+        
+        <TextField
+          value={message}
+          onChange={(message) => setMessage(message)}
+          multiline={10}
+          label="Message"
+        />
+
+        <Button submit>Submit</Button>
+      </FormLayout>
+    </Form>
+    
+    <br />
+    
+    <Card>
+        <DataTable
+          columnContentTypes={[
+            'text',
+            'text',
+          ]}
+          headings={[
+            'Name',
+            'Message',
+          ]}
+          rows={[[]]}
+        />
+      </Card>
+          </Page>
+        </AppProvider>,
+      
       </header>
     </div>
   );
