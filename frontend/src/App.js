@@ -3,16 +3,17 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import '@shopify/polaris/dist/styles.css';
 import enTranslations from '@shopify/polaris/locales/en.json';
 import {AppProvider, Page, Card, Button, Form, FormLayout, TextField, DataTable} from '@shopify/polaris';
-import {useState, useCallback} from 'react';
+import {useState, useCallback, useEffect} from 'react';
 
 function App() {
   const backendPath = "/.netlify/functions/index";
   const [name, setName] = useState('');
   const [message, setMessage] = useState('');
+  const [rows, setRows] = useState([]);
 
   const handleSubmit = useCallback((_event) => {
     (async () => {
-      await fetch(`${backendPath}/message`, {
+      const response = await fetch(`${backendPath}/message`, {
         method: 'POST',
         headers: {
         'Content-Type': 'application/json'
@@ -21,9 +22,21 @@ function App() {
           name,
           message
         })
-      }) 
+      });
+      const rows = await response.json();
+      setRows(rows);
     })();
   }, [name, message]);
+  
+  
+  useEffect(() => {
+    (async () => {
+      const response = await fetch(`${backendPath}/message`);
+      const rows = await response.json();
+      setRows(rows);
+    })();
+    
+  });
 
 
 
@@ -65,7 +78,7 @@ function App() {
             'Name',
             'Message',
           ]}
-          rows={[[]]}
+          rows={rows}
         />
       </Card>
           </Page>

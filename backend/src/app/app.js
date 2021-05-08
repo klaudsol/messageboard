@@ -1,5 +1,6 @@
 //Defaults should favor development environment
 
+import "dotenv/config";
 import "@babel/polyfill";
 import "cross-fetch/polyfill";
 import Koa from "koa";
@@ -8,6 +9,8 @@ import proxy from "koa-proxy";
 import mount from "koa-mount";
 import serverless from "serverless-http";
 import bodyParser from "koa-bodyparser";
+import Redis from "ioredis"
+  
 
 
 const backend = new Koa();
@@ -19,9 +22,27 @@ const frontendPort = 8081;
 const port = 8080;
 
 router.get("/message", async (ctx) => {
+  const client = new Redis(process.env.REDIS_URL);
+  const messages = await client.lrange('messageboard', 0, -1);
+  console.error(messages);
+  ctx.body = messages.map((message) => {
+    const {name, message: _message} = JSON.parse(message);
+    return [name, _message];
+  });
+  
 });
 
 router.post("/message", bodyParser(),  async (ctx) => {
+  console.error(process.env.REDIS_URL);
+  console.error(ctx.request.body);
+  const client = new Redis(process.env.REDIS_URL);
+  await client.lpush('messageboard', JSON.stringify(ctx.request.body));
+  const messages = await client.lrange('messageboard', 0, -1);
+  ctx.body = messages.map((message) => {
+    const {name, message: _message} = JSON.parse(message);
+    return [name, _message];
+  });
+  console.error(ctx.body);
 });
 
 backend.use(router.allowedMethods());

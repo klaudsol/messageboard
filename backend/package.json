@@ -19,7 +19,7 @@
     "@babel/polyfill": "^7.6.0",
     "@babel/register": "^7.12.10",
     "cross-fetch": "^3.0.6",
-    "dotenv": "^8.2.0",
+    "dotenv": "^8.6.0",
     "encoding": "^0.1.13",
     "ioredis": "^4.22.0",
     "koa": "^2.13.1",
