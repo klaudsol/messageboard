@@ -23,26 +23,34 @@ const port = 8080;
 
 router.get("/message", async (ctx) => {
   const client = new Redis(process.env.REDIS_URL);
-  const messages = await client.lrange('messageboard', 0, -1);
-  console.error(messages);
-  ctx.body = messages.map((message) => {
-    const {name, message: _message} = JSON.parse(message);
-    return [name, _message];
-  });
+  try {
+    const messages = await client.lrange('messageboard', 0, -1);
+    console.error(messages);
+    ctx.body = messages.map((message) => {
+      const {name, message: _message} = JSON.parse(message);
+      return [name, _message];
+    });
+  } finally {
+    if (client) client.quit();  
+  }
   
 });
 
 router.post("/message", bodyParser(),  async (ctx) => {
-  console.error(process.env.REDIS_URL);
-  console.error(ctx.request.body);
   const client = new Redis(process.env.REDIS_URL);
-  await client.lpush('messageboard', JSON.stringify(ctx.request.body));
-  const messages = await client.lrange('messageboard', 0, -1);
-  ctx.body = messages.map((message) => {
-    const {name, message: _message} = JSON.parse(message);
-    return [name, _message];
-  });
-  console.error(ctx.body);
+  try {
+    console.error(process.env.REDIS_URL);
+    console.error(ctx.request.body);
+    await client.lpush('messageboard', JSON.stringify(ctx.request.body));
+    const messages = await client.lrange('messageboard', 0, -1);
+    ctx.body = messages.map((message) => {
+      const {name, message: _message} = JSON.parse(message);
+      return [name, _message];
+    });
+    console.error(ctx.body);
+  } finally {
+    if (client) client.quit();  
+  }
 });
 
 backend.use(router.allowedMethods());
